@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planet Space Shooter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="start-screen">
+            <h1>Planet Space Shooter</h1>
+            <button id="start-button" type="button" onclick="startGame()" ontouchstart="startGame()">Commencer</button>
+            <div id="start-instructions">Appuyez sur Entrée ou sur le bouton pour lancer le jeu.</div>
+        </div>
+        <div id="main-layout">
+            <div id="left-panel">
+                <div id="stats">
+                    <div id="score">Score : 0</div>
+                    <div id="xp">XP : 0</div>
+                    <div id="level">Niveau : 1</div>
+                    <div id="time">Temps : 0s</div>
+                    <div id="weapon">Vaisseau : Basique</div>
+                    <div id="power">Pouvoir : Aucun</div>
+                </div>
+            </div>
+            <div id="canvas-wrapper">
+                <canvas id="game-canvas" width="1200" height="900"></canvas>
+            </div>
+            <div id="right-panel">
+                <div id="hearts">♥♥♥</div>
+                <div id="instructions">Utilisez les flèches pour bouger, F pour tirer. Appuyez sur 1-4 pour changer de vaisseau. Détruisez les pommes spéciales pour obtenir des pouvoirs.</div>
+            </div>
+        </div>
+        <div id="game-over" class="hidden">GAME OVER<br>Appuyez sur Entrée pour recommencer</div>
+    </div>
+    <footer id="copyright">
+        © 2026 Planet Space Shooter - Tous droits réservés
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
