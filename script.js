@@ -768,8 +768,8 @@ function drawBackground() {
     // Aurore boréale animée
     const auroraGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
     auroraGradient.addColorStop(0, `hsla(180, 100%, 50%, 0)`);
-    auroraGradient.addColorStop(0.3, `hsla(200 + Math.sin(time * 0.3) * 40, 100%, 50%, ${0.1 + Math.sin(time * 0.5) * 0.05})`);
-    auroraGradient.addColorStop(0.7, `hsla(280 + Math.sin(time * 0.4) * 40, 100%, 50%, ${0.1 + Math.sin(time * 0.6) * 0.05})`);
+    auroraGradient.addColorStop(0.3, `hsla(${200 + Math.sin(time * 0.3) * 40}, 100%, 50%, ${0.1 + Math.sin(time * 0.5) * 0.05})`);
+    auroraGradient.addColorStop(0.7, `hsla(${280 + Math.sin(time * 0.4) * 40}, 100%, 50%, ${0.1 + Math.sin(time * 0.6) * 0.05})`);
     auroraGradient.addColorStop(1, `hsla(180, 100%, 50%, 0)`);
     ctx.fillStyle = auroraGradient;
     ctx.fillRect(0, 50 + Math.sin(time * 0.1) * 100, canvas.width, 150);
