@@ -737,13 +737,42 @@ function update() {
 }
 
 function drawBackground() {
-    // Fond spatial dégradé
-    const gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, Math.max(canvas.width, canvas.height));
-    gradient.addColorStop(0, '#0a0f1f');
-    gradient.addColorStop(0.5, '#030712');
-    gradient.addColorStop(1, '#000000');
+    // Fond spatial avec vagues animées
+    const time = elapsedTime;
+    
+    // Dégradé principal avec effet de vagues
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, `hsl(260, 60%, ${10 + Math.sin(time * 0.5) * 3}%)`);
+    gradient.addColorStop(0.5, `hsl(240, 50%, ${5 + Math.sin(time * 0.3) * 2}%)`);
+    gradient.addColorStop(1, `hsl(280, 40%, ${3 + Math.sin(time * 0.4) * 2}%)`);
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Vagues de plasma animées
+    const waveAmount = 3;
+    for (let w = 0; w < waveAmount; w++) {
+        ctx.strokeStyle = `hsla(${200 + w * 30}, 100%, 50%, ${0.15 - w * 0.04})`;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let x = 0; x < canvas.width; x += 20) {
+            const y = canvas.height / 2 + Math.sin(x * 0.01 + time * 0.02 + w) * 50 + w * 40;
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.lineTo(canvas.width, canvas.height);
+        ctx.lineTo(0, canvas.height);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    // Aurore boréale animée
+    const auroraGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    auroraGradient.addColorStop(0, `hsla(180, 100%, 50%, 0)`);
+    auroraGradient.addColorStop(0.3, `hsla(200 + Math.sin(time * 0.3) * 40, 100%, 50%, ${0.1 + Math.sin(time * 0.5) * 0.05})`);
+    auroraGradient.addColorStop(0.7, `hsla(280 + Math.sin(time * 0.4) * 40, 100%, 50%, ${0.1 + Math.sin(time * 0.6) * 0.05})`);
+    auroraGradient.addColorStop(1, `hsla(180, 100%, 50%, 0)`);
+    ctx.fillStyle = auroraGradient;
+    ctx.fillRect(0, 50 + Math.sin(time * 0.1) * 100, canvas.width, 150);
 
     // Nébuleuses
     nebulas.forEach(nebula => {
@@ -758,31 +787,52 @@ function drawBackground() {
         ctx.fill();
     });
 
-    // Planètes lointaines
-    distantPlanets.forEach(planet => {
+    // Planètes lointaines avec effet de brillance
+    distantPlanets.forEach((planet, idx) => {
         planet.y += planet.speed;
         if (planet.y > canvas.height + planet.radius) planet.y = -planet.radius;
+        
+        // Halo autour de la planète
+        const haloGradient = ctx.createRadialGradient(planet.x, planet.y, 0, planet.x, planet.y, planet.radius * 1.8);
+        haloGradient.addColorStop(0, `rgba(255, 255, 255, ${0.1 + Math.sin(time * 0.3 + idx) * 0.05})`);
+        haloGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = haloGradient;
+        ctx.beginPath();
+        ctx.arc(planet.x, planet.y, planet.radius * 1.8, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Planète
         ctx.fillStyle = planet.color;
         ctx.beginPath();
         ctx.arc(planet.x, planet.y, planet.radius, 0, Math.PI * 2);
         ctx.fill();
-        // Ombre sur la planète
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        
+        // Ombre animée sur la planète
+        ctx.fillStyle = `rgba(0, 0, 0, ${0.2 + Math.sin(time * 0.2 + idx) * 0.1})`;
         ctx.beginPath();
-        ctx.arc(planet.x - planet.radius * 0.3, planet.y - planet.radius * 0.3, planet.radius * 0.7, 0, Math.PI * 2);
+        ctx.arc(planet.x - planet.radius * 0.4, planet.y - planet.radius * 0.3, planet.radius * 0.8, 0, Math.PI * 2);
         ctx.fill();
     });
 
-    // Étoiles avec scintillement
-    stars.forEach(star => {
+    // Étoiles avec scintillement amélioré
+    stars.forEach((star, idx) => {
         star.y += star.speed;
         star.alpha += star.twinkle;
-        if (star.alpha > 0.8) star.twinkle = -Math.abs(star.twinkle);
-        if (star.alpha < 0.2) star.twinkle = Math.abs(star.twinkle);
+        if (star.alpha > 0.9) star.twinkle = -Math.abs(star.twinkle);
+        if (star.alpha < 0.1) star.twinkle = Math.abs(star.twinkle);
         if (star.y > canvas.height) {
             star.y = 0;
             star.x = Math.random() * canvas.width;
         }
+        
+        // Étoile avec halo
+        const haloSize = star.size * (1 + Math.sin(time * 0.1 + idx) * 0.5);
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha * 0.3})`;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, haloSize, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Étoile brillante
         ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
