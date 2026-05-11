@@ -154,20 +154,20 @@ window.startGame = startGame;
 
 const shipUpgrades = [
     { name: 'Basique', speed: 6, fireRate: 10, bulletColor: '#fff176', size: 24, color: '#9df7ff' },
-    { name: 'Rapide', speed: 7.5, fireRate: 8, bulletColor: '#ff9d40', size: 20, color: '#61caf7' },
-    { name: 'Sniper', speed: 6.8, fireRate: 9, bulletColor: '#7df0ff', size: 26, color: '#7dffff' },
+    { name: 'Rapide', speed: 7.5, fireRate: 9, bulletColor: '#ff9d40', size: 20, color: '#61caf7' },
+    { name: 'Sniper', speed: 6.8, fireRate: 10, bulletColor: '#7df0ff', size: 26, color: '#7dffff' },
     { name: 'Tank', speed: 5.8, fireRate: 12, bulletColor: '#c47dff', size: 30, color: '#9f5dff' },
-    { name: 'Fusée', speed: 8.2, fireRate: 7, bulletColor: '#9aff7c', size: 22, color: '#a6ff8c' },
-    { name: 'Nova', speed: 8.6, fireRate: 6, bulletColor: '#ff5cde', size: 28, color: '#ff82e8' },
-    { name: 'Spectre', speed: 8.8, fireRate: 5, bulletColor: '#ff00ff', size: 26, color: '#e600ff' },
+    { name: 'Fusée', speed: 8.2, fireRate: 10, bulletColor: '#9aff7c', size: 22, color: '#a6ff8c' },
+    { name: 'Nova', speed: 8.6, fireRate: 11, bulletColor: '#ff5cde', size: 28, color: '#ff82e8' },
+    { name: 'Spectre', speed: 8.8, fireRate: 12, bulletColor: '#ff00ff', size: 26, color: '#e600ff' },
     { name: 'Titan', speed: 5, fireRate: 15, bulletColor: '#ffff00', size: 36, color: '#ffaa00' },
-    { name: 'Eclaire', speed: 9.2, fireRate: 4, bulletColor: '#00ffff', size: 24, color: '#00ff88' },
-    { name: 'Photon', speed: 9.5, fireRate: 3, bulletColor: '#ffffff', size: 22, color: '#ffffff' },
-    { name: 'Quantum', speed: 9.8, fireRate: 2, bulletColor: '#ff0080', size: 20, color: '#ff0080' },
-    { name: 'Nexus', speed: 10, fireRate: 1.5, bulletColor: '#8000ff', size: 18, color: '#8000ff' },
-    { name: 'Void', speed: 10.2, fireRate: 1, bulletColor: '#000000', size: 16, color: '#000000' },
-    { name: 'Cosmos', speed: 10.5, fireRate: 0.8, bulletColor: '#ff8000', size: 14, color: '#ff8000' },
-    { name: 'Laser Ultime', speed: 11, fireRate: 20, bulletColor: '#ff0000', size: 40, color: '#ff0000' }
+    { name: 'Eclaire', speed: 9.2, fireRate: 13, bulletColor: '#00ffff', size: 24, color: '#00ff88' },
+    { name: 'Photon', speed: 9.5, fireRate: 14, bulletColor: '#ffffff', size: 22, color: '#ffffff' },
+    { name: 'Quantum', speed: 9.8, fireRate: 15, bulletColor: '#ff0080', size: 20, color: '#ff0080' },
+    { name: 'Nexus', speed: 10, fireRate: 16, bulletColor: '#8000ff', size: 18, color: '#8000ff' },
+    { name: 'Void', speed: 10.2, fireRate: 17, bulletColor: '#000000', size: 16, color: '#000000' },
+    { name: 'Cosmos', speed: 10.5, fireRate: 18, bulletColor: '#ff8000', size: 14, color: '#ff8000' },
+    { name: 'Laser Ultime', speed: 7, fireRate: 25, bulletColor: '#ff0000', size: 50, color: '#ff0000' }
 ];
 let currentShipLevel = 0;
 
@@ -508,6 +508,8 @@ function detonateBomb() {
 }
 function prepareNextLevel() {
     level++;
+    xp = 0;
+    xpElement.textContent = 'XP : 0';
     levelElement.textContent = 'Niveau : ' + level;
     bossStage = true;
     bossSpawned = false;
@@ -624,18 +626,9 @@ function update() {
         bullet.x += bullet.vx;
         bullet.y += bullet.vy;
 
-        // Rebond sur les bords
-        if (bullet.x - bullet.radius < 0) {
-            bullet.x = bullet.radius;
-            bullet.vx = Math.abs(bullet.vx);
-            playSound('hit');
-        }
-        if (bullet.x + bullet.radius > canvas.width) {
-            bullet.x = canvas.width - bullet.radius;
-            bullet.vx = -Math.abs(bullet.vx);
-            playSound('hit');
-        }
-        if (bullet.y + bullet.radius < 0 || bullet.y - bullet.radius > canvas.height) {
+        // Supprimer les balles hors de l'écran
+        if (bullet.x + bullet.radius < 0 || bullet.x - bullet.radius > canvas.width ||
+            bullet.y + bullet.radius < 0 || bullet.y - bullet.radius > canvas.height) {
             bullets.splice(index, 1);
         }
     });
