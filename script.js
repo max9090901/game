@@ -75,6 +75,10 @@ const bulletRadius = 5;
 // Lasers
 let lasers = [];
 
+// Particules et effets
+let particles = [];
+let screenShake = 0;
+
 // Contrôles
 let keys = {};
 
@@ -435,6 +439,50 @@ function createLaser(x, y, targetX, targetY, damage = 10) {
     });
 }
 
+function spawnParticles(x, y, color, count = 12, size = 2, speed = 3, life = 30) {
+    for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * speed;
+        particles.push({
+            x,
+            y,
+            vx: Math.cos(angle) * velocity,
+            vy: Math.sin(angle) * velocity,
+            size: size + Math.random() * size,
+            alpha: 1,
+            color,
+            life,
+            age: 0
+        });
+    }
+}
+
+function updateParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const particle = particles[i];
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.vx *= 0.95;
+        particle.vy *= 0.95;
+        particle.age += 1;
+        particle.alpha = Math.max(0, 1 - particle.age / particle.life);
+        if (particle.age >= particle.life) {
+            particles.splice(i, 1);
+        }
+    }
+}
+
+function drawParticles() {
+    particles.forEach(particle => {
+        ctx.globalAlpha = particle.alpha;
+        ctx.fillStyle = particle.color;
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    });
+}
+
 function activatePower(name) {
     if (!name) return;
     activePower = name;
@@ -540,6 +588,8 @@ function loseLife(damage = 10) {
         return;
     }
     health -= damage;
+    screenShake = Math.min(20, screenShake + 8);
+    spawnParticles(ship.x, ship.y, '#ff4f6d', 14, 3, 4, 24);
     renderHealthBar();
     if (health <= 0) {
         endGame();
@@ -591,6 +641,7 @@ function update() {
     if (keys['ArrowLeft'] && ship.x > 30) ship.x -= ship.speed;
     if (keys['ArrowRight'] && ship.x < canvas.width - 30) ship.x += ship.speed;
     if (keys['KeyF']) shoot();
+    updateParticles();
 
     apples.forEach((apple, index) => {
         const effectiveSpeed = apple.speedY * (activePower === 'freeze' ? 0.4 : 1);
@@ -649,7 +700,11 @@ function update() {
                     score += apple.score;
                     scoreElement.textContent = 'Score : ' + score;
                     gainXP(apple.xp);
-                    if (defeatedBoss) completeBoss();
+                    spawnParticles(apple.x, apple.y, apple.color, defeatedBoss ? 36 : 18, defeatedBoss ? 6 : 3, defeatedBoss ? 5 : 3, defeatedBoss ? 45 : 30);
+                    if (defeatedBoss) {
+                        screenShake = 20;
+                        completeBoss();
+                    }
                 }
             }
         });
@@ -918,6 +973,11 @@ function drawShip() {
 }
 
 function draw() {
+    ctx.save();
+    if (screenShake > 0) {
+        const shake = Math.min(screenShake, 12);
+        ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+    }
     drawBackground();
     drawShip();
 
@@ -1058,12 +1118,14 @@ function draw() {
 
         // Effet lumineux
         ctx.shadowColor = laser.color;
-        ctx.shadowBlur = 10;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.shadowBlur = 14;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
         ctx.fillRect(-laser.height/2, -laser.width/4, laser.height, laser.width/2);
 
         ctx.restore();
     });
+
+    drawParticles();
 
     if (bossMessageTimer > 0) {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
@@ -1071,6 +1133,12 @@ function draw() {
         ctx.textAlign = 'center';
         ctx.fillText(bossMessage, canvas.width / 2, 70);
         bossMessageTimer -= 1;
+    }
+
+    ctx.restore();
+    if (screenShake > 0) {
+        screenShake *= 0.88;
+        if (screenShake < 0.5) screenShake = 0;
     }
     
     // Barre d'XP
